@@ -28,10 +28,11 @@ pipeline {
                 script {
                     // Ensure the file exists
                     sh 'ls -al'
-                    sh 'ls -al C:\Users\aksha\Desktop\web-jenkins-docker-k8s/k8s-deployment.yaml'
+                    sh 'ls -al C:/Users/aksha/Desktop/web-jenkins-docker-k8s/k8s-deployment.yaml'
+
 
                     // Apply Kubernetes deployment
-                    sh 'kubectl apply -f C:\Users\aksha\Desktop\web-jenkins-docker-k8s/k8s-deployment.yaml'
+                    sh 'kubectl apply -f C:/Users/aksha/Desktop/web-jenkins-docker-k8s/k8s-deployment.yaml'
                 }
             }
         }
