@@ -1,27 +1,24 @@
 pipeline {
     agent any
-    environment {
-        DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKER_IMAGE = "akki2309/web-jenkins-docker-k8s"
-    }
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: 'main', url: 'https://github.com/2309Akki/web-jenkins-docker-k8s.git'
+                checkout scm
             }
         }
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE)
+                    sh 'docker build -t akki2309/web-jenkins-docker-k8s .'
                 }
             }
         }
         stage('Push to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'DOCKER_HUB_CREDENTIALS') {
-                        docker.image(DOCKER_IMAGE).push("latest")
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    script {
+                        sh "docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD"
+                        sh "docker push akki2309/web-jenkins-docker-k8s:latest"
                     }
                 }
             }
@@ -29,8 +26,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh "kubectl apply -f ~/k8s-deployment/k8s-deployment.yaml"
-                    sh "kubectl apply -f ~/k8s-deployment/k8s-service.yaml"
+                    // Ensure the file exists
+                    sh 'ls -al'
+                    sh 'ls -al C:\Users\aksha\Desktop\web-jenkins-docker-k8s/k8s-deployment.yaml'
+
+                    // Apply Kubernetes deployment
+                    sh 'kubectl apply -f C:\Users\aksha\Desktop\web-jenkins-docker-k8s/k8s-deployment.yaml'
                 }
             }
         }
